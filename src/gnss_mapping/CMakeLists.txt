@@ -9,7 +9,6 @@ endif()
 
 
 find_package(catkin REQUIRED COMPONENTS
-  nav_msgs
   pcl_conversions
   pcl_ros
   roscpp
