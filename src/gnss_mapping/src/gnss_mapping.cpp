@@ -421,30 +421,30 @@ int main(int argc, char** argv)
   private_nh.param<std::string>("map_topic", _map_topic, "points_map");
 
   // setting parameters
-  private_nh.getParam("voxel_leaf_size", _voxel_leaf_size);
-  private_nh.getParam("min_scan_range", _min_scan_range);
-  private_nh.getParam("max_scan_range", _max_scan_range);
-  private_nh.getParam("use_ndt", _use_ndt);
-  private_nh.getParam("use_gnss_ori", _use_gnss_ori);
-  private_nh.getParam("min_height", _min_height);
-  private_nh.getParam("min_add_scan_shift", _min_add_scan_shift);
-  private_nh.getParam("incremental_voxel_update", _incremental_voxel_update);
+  private_nh.param<double>("voxel_leaf_size", _voxel_leaf_size, 1.0);
+  private_nh.param<double>("min_scan_range", _min_scan_range, 5.0);
+  private_nh.param<double>("max_scan_range", _max_scan_range, 200.0);
+  private_nh.param<bool>("use_ndt", _use_ndt, false);
+  private_nh.param<bool>("use_gnss_ori", _use_gnss_ori, false);
+  private_nh.param<double>("min_height", _min_height, 0.0);
+  private_nh.param<double>("min_add_scan_shift", _min_add_scan_shift, 1.0);
+  private_nh.param<bool>("incremental_voxel_update", _incremental_voxel_update, false);
   private_nh.getParam("output_path", _output_path);
   
   if(_use_ndt)
   {
-    private_nh.getParam("resolution", _ndt_res);
-    private_nh.getParam("step_size", _step_size);
-    private_nh.getParam("trans_eps", _trans_eps);
-    private_nh.getParam("max_iter", _max_iter);
+    private_nh.param<float>("resolution", _ndt_res, 4.0);
+    private_nh.param<double>("step_size", _step_size, 0.1);
+    private_nh.param<double>("trans_eps", _trans_eps, 0.01);
+    private_nh.param<int>("max_iter", _max_iter, 10);
   }
 
-  private_nh.getParam("tf_x", _tf_x);
-  private_nh.getParam("tf_y", _tf_y);
-  private_nh.getParam("tf_z", _tf_z);
-  private_nh.getParam("tf_roll", _tf_roll);
-  private_nh.getParam("tf_pitch", _tf_pitch);
-  private_nh.getParam("tf_yaw", _tf_yaw);
+  private_nh.param<double>("tf_x", _tf_x, 0.0);
+  private_nh.param<double>("tf_y", _tf_y, 0.0);
+  private_nh.param<double>("tf_z", _tf_z, 0.0);
+  private_nh.param<double>("tf_roll", _tf_roll, 0.0);
+  private_nh.param<double>("tf_pitch", _tf_pitch, 0.0);
+  private_nh.param<double>("tf_yaw", _tf_yaw, 0.0);
 
   std::cout << "voxel_leaf_size: " << _voxel_leaf_size << std::endl;
   std::cout << "min_scan_range: " << _min_scan_range << std::endl;
