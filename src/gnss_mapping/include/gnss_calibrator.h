@@ -55,6 +55,9 @@ private:
 
   // variables
   int32_t plane_number_;
+  std::string gnss_topic_;
+  std::string nmea_topic_;
+
   geo_pos_conv geo_;
   geo_pos_conv last_geo_;
   double roll_, pitch_, yaw_;

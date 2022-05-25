@@ -30,7 +30,9 @@ Nmea2TFPoseNode::~Nmea2TFPoseNode()
 void Nmea2TFPoseNode::initForROS()
 {
   // ros parameter settings
-  private_nh_.getParam("plane", plane_number_);
+  private_nh_.param<int>("plane", plane_number_, 0);
+  private_nh_.param<std::string>("gnss_topic", gnss_topic_, "gnss_pose");
+  private_nh_.param<std::string>("nmea_topic", nmea_topic_, "nmea_sentence");
 
   // setup subscriber
   sub1_ = nh_.subscribe("nmea_sentence", 100, &Nmea2TFPoseNode::callbackFromNmeaSentence, this);

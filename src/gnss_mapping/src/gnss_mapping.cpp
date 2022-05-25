@@ -30,6 +30,9 @@ struct pose
   double yaw;
 };
 
+////// Topic Name
+static std::string _points_topic, _gnss_topic, _map_topic;
+
 ////// NDT Parameter
 static pcl::NormalDistributionsTransform<pcl::PointXYZI, pcl::PointXYZI> ndt;
 static int _max_iter = 30;        // Maximum iterations
@@ -41,7 +44,6 @@ static bool has_converged;
 static int final_num_iteration;
 static double transformation_probability;
 static int initial_scan_loaded = 0;
-
 
 ////// global variables
 static pose previous_gnss_pose, current_gnss_pose, localizer_pose, added_pose;
@@ -414,6 +416,10 @@ int main(int argc, char** argv)
   ros::NodeHandle nh;
   ros::NodeHandle private_nh("~");
 
+  private_nh.param<std::string>("points_topic", _points_topic, "points_raw");
+  private_nh.param<std::string>("gnss_topic", _gnss_topic, "gnss_pose");
+  private_nh.param<std::string>("map_topic", _map_topic, "points_map");
+
   // setting parameters
   private_nh.getParam("voxel_leaf_size", _voxel_leaf_size);
   private_nh.getParam("min_scan_range", _min_scan_range);
@@ -424,10 +430,14 @@ int main(int argc, char** argv)
   private_nh.getParam("min_add_scan_shift", _min_add_scan_shift);
   private_nh.getParam("incremental_voxel_update", _incremental_voxel_update);
   private_nh.getParam("output_path", _output_path);
-  private_nh.getParam("resolution", _ndt_res);
-  private_nh.getParam("step_size", _step_size);
-  private_nh.getParam("trans_eps", _trans_eps);
-  private_nh.getParam("max_iter", _max_iter);
+  
+  if(_use_ndt)
+  {
+    private_nh.getParam("resolution", _ndt_res);
+    private_nh.getParam("step_size", _step_size);
+    private_nh.getParam("trans_eps", _trans_eps);
+    private_nh.getParam("max_iter", _max_iter);
+  }
 
   private_nh.getParam("tf_x", _tf_x);
   private_nh.getParam("tf_y", _tf_y);
@@ -453,12 +463,11 @@ int main(int argc, char** argv)
 
   map.header.frame_id = "map";
 
-  points_map_pub = nh.advertise<sensor_msgs::PointCloud2>("/points_map", 1000);
+  points_map_pub = nh.advertise<sensor_msgs::PointCloud2>(_map_topic, 1000);
   current_pose_pub = nh.advertise<geometry_msgs::PoseStamped>("/current_pose", 1000);
 
-  ros::Subscriber points_sub = nh.subscribe("points_raw", 100000, points_callback);
-
-  ros::Subscriber gnss_sub = nh.subscribe("gnss_pose", 100000, gnss_callback);
+  ros::Subscriber points_sub = nh.subscribe(_points_topic, 100000, points_callback);
+  ros::Subscriber gnss_sub = nh.subscribe(_gnss_topic, 100000, gnss_callback);
 
   ros::Rate loop_rate(10);
 

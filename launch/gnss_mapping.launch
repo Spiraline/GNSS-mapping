@@ -1,4 +1,9 @@
 <launch>
+  <arg name="nmea_topic" default="/nmea_sentence" />
+  <arg name="gnss_topic" default="/gnss_pose" />
+  <arg name="points_topic" default="/points_raw" />
+  <arg name="map_topic" default="/points_map" />
+
   <arg name="voxel_leaf_size" default="1.0" />
   <arg name="min_scan_range" default="7.0" />
   <arg name="max_scan_range" default="200.0" />
@@ -27,8 +32,14 @@
   <!-- rosrun lidar_localizer ndt_mapping  -->
   <node pkg="gnss_mapping" type="gnss_calibrator" name="gnss_calibrator" output="screen">
     <param name="plane" value="0"/>
+    <param name="gnss_topic" value="$(arg gnss_topic)"/>
+    <param name="nmea_topic" value="$(arg nmea_topic)"/>
   </node>
   <node pkg="gnss_mapping" type="gnss_mapping" name="gnss_mapping" output="screen">
+    <param name="gnss_topic" value="$(arg gnss_topic)"/>
+    <param name="points_topic" value="$(arg points_topic)"/>
+    <param name="map_topic" value="$(arg map_topic)"/>
+
     <param name="voxel_leaf_size" value="$(arg voxel_leaf_size)" />
     <param name="min_scan_range" value="$(arg min_scan_range)" />
     <param name="max_scan_range" value="$(arg max_scan_range)" />
