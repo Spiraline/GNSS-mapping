@@ -89,6 +89,24 @@ static double calcDiffForRadian(const double lhs_rad, const double rhs_rad)
   return diff_rad;
 }
 
+
+static void tf_callback(const geometry_msgs::Pose::ConstPtr& input)
+{
+  _tf_x = input->position.x;
+  _tf_y = input->position.y;
+  _tf_z = input->position.z;
+  _tf_roll = input->orientation.x;
+  _tf_pitch = input->orientation.y;
+  _tf_yaw = input->orientation.z;
+
+  Eigen::Translation3f tl_btol(_tf_x, _tf_y, _tf_z);                 // tl: translation
+  Eigen::AngleAxisf rot_x_btol(_tf_roll, Eigen::Vector3f::UnitX());  // rot: rotation
+  Eigen::AngleAxisf rot_y_btol(_tf_pitch, Eigen::Vector3f::UnitY());
+  Eigen::AngleAxisf rot_z_btol(_tf_yaw, Eigen::Vector3f::UnitZ());
+  tf_btol = (tl_btol * rot_z_btol * rot_y_btol * rot_x_btol).matrix();
+  tf_ltob = tf_btol.inverse();
+}
+
 static void gnss_callback(const geometry_msgs::PoseStamped::ConstPtr& input)
 {
   current_gnss_pose.x = input->pose.position.x;
@@ -463,8 +481,10 @@ int main(int argc, char** argv)
   points_map_pub = nh.advertise<sensor_msgs::PointCloud2>(_map_topic, 1000);
   current_pose_pub = nh.advertise<geometry_msgs::PoseStamped>("/current_pose", 1000);
 
-  ros::Subscriber points_sub = nh.subscribe(_points_topic, 100000, points_callback);
-  ros::Subscriber gnss_sub = nh.subscribe(_gnss_topic, 100000, gnss_callback);
+  ros::Subscriber points_sub = nh.subscribe(_points_topic, 10000, points_callback);
+  ros::Subscriber gnss_sub = nh.subscribe(_gnss_topic, 10000, gnss_callback);
+
+  ros::Subscriber tf_sub = nh.subscribe("gnss_to_localizer", 10, tf_callback);
 
   ros::Rate loop_rate(10);
 

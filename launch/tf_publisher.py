@@ -58,7 +58,7 @@ class tf_publisher:
         if mode < 3 and self.val[mode].get() >= POS_MAX * 100:
             return
         
-        if self.val[mode].get() >= ORI_MAX * 100:
+        if mode >= 3 and self.val[mode].get() >= ORI_MAX * 100:
             return
         
         self.val[mode].set(self.val[mode].get() + 1)
@@ -70,7 +70,7 @@ class tf_publisher:
         if mode < 3 and self.val[mode].get() <= POS_MIN * 100:
             return
         
-        if self.val[mode].get() <= ORI_MIN * 100:
+        if mode >= 3 and self.val[mode].get() <= ORI_MIN * 100:
             return
         
         self.val[mode].set(self.val[mode].get() - 1)
