@@ -34,7 +34,7 @@ struct pose
 static std::string _points_topic, _gnss_topic, _map_topic;
 
 ////// NDT Parameter
-static pcl::NormalDistributionsTransform<pcl::PointXYZI, pcl::PointXYZI> ndt;
+static pcl::NormalDistributionsTransform<pcl::PointXYZ, pcl::PointXYZ> ndt;
 static int _max_iter = 30;        // Maximum iterations
 static float _ndt_res = 1.0;      // Resolution
 static double _step_size = 0.1;   // Step size
@@ -57,7 +57,7 @@ static int initial_yaw = 0;
 static ros::Time current_scan_time;
 static ros::Time previous_scan_time;
 
-static pcl::PointCloud<pcl::PointXYZI> map;
+static pcl::PointCloud<pcl::PointXYZ> map;
 
 static ros::Publisher points_map_pub;
 static ros::Publisher current_pose_pub;
@@ -152,8 +152,8 @@ static void gnss_callback(const geometry_msgs::PoseStamped::ConstPtr& input)
 
 static void save_map(double resolution)
 {
-  pcl::PointCloud<pcl::PointXYZI>::Ptr map_ptr(new pcl::PointCloud<pcl::PointXYZI>(map));
-  pcl::PointCloud<pcl::PointXYZI>::Ptr map_filtered(new pcl::PointCloud<pcl::PointXYZI>());
+  pcl::PointCloud<pcl::PointXYZ>::Ptr map_ptr(new pcl::PointCloud<pcl::PointXYZ>(map));
+  pcl::PointCloud<pcl::PointXYZ>::Ptr map_filtered(new pcl::PointCloud<pcl::PointXYZ>());
   map_ptr->header.frame_id = "map";
   map_filtered->header.frame_id = "map";
   sensor_msgs::PointCloud2::Ptr map_msg_ptr(new sensor_msgs::PointCloud2);
@@ -166,7 +166,7 @@ static void save_map(double resolution)
   }
   else
   {
-    pcl::VoxelGrid<pcl::PointXYZI> voxel_grid_filter;
+    pcl::VoxelGrid<pcl::PointXYZ> voxel_grid_filter;
     voxel_grid_filter.setLeafSize(resolution, resolution, resolution);
     voxel_grid_filter.setInputCloud(map_ptr);
     voxel_grid_filter.filter(*map_filtered);
@@ -202,10 +202,10 @@ static void points_callback(const sensor_msgs::PointCloud2::ConstPtr& input)
   if(!gnss_ori_ready) return;
 
   double r;
-  pcl::PointXYZI p;
-  pcl::PointCloud<pcl::PointXYZI> tmp, scan;
-  pcl::PointCloud<pcl::PointXYZI>::Ptr filtered_scan_ptr(new pcl::PointCloud<pcl::PointXYZI>());
-  pcl::PointCloud<pcl::PointXYZI>::Ptr transformed_scan_ptr(new pcl::PointCloud<pcl::PointXYZI>());
+  pcl::PointXYZ p;
+  pcl::PointCloud<pcl::PointXYZ> tmp, scan;
+  pcl::PointCloud<pcl::PointXYZ>::Ptr filtered_scan_ptr(new pcl::PointCloud<pcl::PointXYZ>());
+  pcl::PointCloud<pcl::PointXYZ>::Ptr transformed_scan_ptr(new pcl::PointCloud<pcl::PointXYZ>());
   tf::Quaternion q;
 
   Eigen::Matrix4f t_localizer(Eigen::Matrix4f::Identity());
@@ -217,12 +217,11 @@ static void points_callback(const sensor_msgs::PointCloud2::ConstPtr& input)
 
   pcl::fromROSMsg(*input, tmp);
 
-  for (pcl::PointCloud<pcl::PointXYZI>::const_iterator item = tmp.begin(); item != tmp.end(); item++)
+  for (pcl::PointCloud<pcl::PointXYZ>::const_iterator item = tmp.begin(); item != tmp.end(); item++)
   {
     p.x = (double)item->x;
     p.y = (double)item->y;
     p.z = (double)item->z;
-    p.intensity = (double)item->intensity;
 
     r = sqrt(pow(p.x, 2.0) + pow(p.y, 2.0));
     if (_min_scan_range < r && r < _max_scan_range && p.z >= _min_height)
@@ -231,15 +230,15 @@ static void points_callback(const sensor_msgs::PointCloud2::ConstPtr& input)
     }
   }
 
-  pcl::PointCloud<pcl::PointXYZI>::Ptr scan_ptr(new pcl::PointCloud<pcl::PointXYZI>(scan));
+  pcl::PointCloud<pcl::PointXYZ>::Ptr scan_ptr(new pcl::PointCloud<pcl::PointXYZ>(scan));
 
   // Apply voxelgrid filter
-  pcl::VoxelGrid<pcl::PointXYZI> voxel_grid_filter;
+  pcl::VoxelGrid<pcl::PointXYZ> voxel_grid_filter;
   voxel_grid_filter.setLeafSize(_voxel_leaf_size, _voxel_leaf_size, _voxel_leaf_size);
   voxel_grid_filter.setInputCloud(scan_ptr);
   voxel_grid_filter.filter(*filtered_scan_ptr);
 
-  pcl::PointCloud<pcl::PointXYZI>::Ptr map_ptr(new pcl::PointCloud<pcl::PointXYZI>(map));
+  pcl::PointCloud<pcl::PointXYZ>::Ptr map_ptr(new pcl::PointCloud<pcl::PointXYZ>(map));
 
   Eigen::AngleAxisf gnss_rotation_x(current_gnss_pose.roll, Eigen::Vector3f::UnitX());
   Eigen::AngleAxisf gnss_rotation_y(current_gnss_pose.pitch, Eigen::Vector3f::UnitY());
@@ -254,7 +253,7 @@ static void points_callback(const sensor_msgs::PointCloud2::ConstPtr& input)
   tf::Matrix3x3 mat_n, mat_l, mat_b;
   if(_use_ndt)
   {
-    pcl::PointCloud<pcl::PointXYZI>::Ptr output_cloud(new pcl::PointCloud<pcl::PointXYZI>);
+    pcl::PointCloud<pcl::PointXYZ>::Ptr output_cloud(new pcl::PointCloud<pcl::PointXYZ>);
     if (initial_scan_loaded == 0)
     {
       pcl::transformPointCloud(*scan_ptr, *transformed_scan_ptr, init_guess);
@@ -317,8 +316,6 @@ static void points_callback(const sensor_msgs::PointCloud2::ConstPtr& input)
   localizer_pose.y = t_localizer(1, 3);
   localizer_pose.z = t_localizer(2, 3);
   mat_l.getRPY(localizer_pose.roll, localizer_pose.pitch, localizer_pose.yaw, 1);
-
-  std::cout << localizer_pose.x << " " << localizer_pose.y << std::endl;
 
   transform.setOrigin(tf::Vector3(localizer_pose.x, localizer_pose.y, localizer_pose.z));
 
