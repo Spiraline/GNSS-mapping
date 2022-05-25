@@ -13,7 +13,8 @@
   <depend>roscpp</depend>
   <depend>sensor_msgs</depend>
   <depend>std_msgs</depend>
+  <depend>nmea_msgs</depend>
+  <depend>geometry_msgs</depend>
   <depend>tf</depend>
-  <depend>velodyne_pointcloud</depend>
 
 </package>

@@ -14,14 +14,15 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   sensor_msgs
   std_msgs
+  geometry_msgs
+  nmea_msgs
+  gnss
   tf
-  velodyne_pointcloud
 )
 
 catkin_package(
   CATKIN_DEPENDS
     std_msgs
-    velodyne_pointcloud
   DEPENDS PCL
 )
 
@@ -41,6 +42,15 @@ include_directories(
 add_executable(gnss_mapping src/gnss_mapping.cpp)
 target_link_libraries(gnss_mapping ${catkin_LIBRARIES})
 add_dependencies(gnss_mapping ${catkin_EXPORTED_TARGETS})
+
+add_executable(gnss_calibrator
+  src/gnss_calibrator_node.cpp
+  src/gnss_calibrator.cpp
+)
+add_dependencies(gnss_calibrator ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(gnss_calibrator
+  ${catkin_LIBRARIES}
+)
 
 install(
   TARGETS
