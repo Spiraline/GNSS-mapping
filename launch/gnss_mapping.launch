@@ -1,7 +1,7 @@
 <launch>
   <arg name="nmea_topic" default="/nmea_sentence" />
   <arg name="gnss_topic" default="/gnss_pose" />
-  <arg name="points_topic" default="/points_raw_origin" />
+  <arg name="points_topic" default="/points_raw" />
   <arg name="map_topic" default="/points_map" />
 
   <arg name="voxel_leaf_size" default="1.0" />
@@ -22,8 +22,8 @@
   <arg name="output_path" default="$(env HOME)" />
 
   <!-- TF from gnss to localizer (LiDAR) -->
-  <arg name="tf_x" default="0.0" />
-  <arg name="tf_y" default="0.0" />
+  <arg name="tf_x" default="5.0" />
+  <arg name="tf_y" default="-3.0" />
   <arg name="tf_z" default="0.0" />
   <arg name="tf_roll" default="0.0" />
   <arg name="tf_pitch" default="0.0" />
