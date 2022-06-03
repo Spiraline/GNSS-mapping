@@ -39,7 +39,7 @@ roslaunch launch/gnss_mapping.launch
 - output_path: output pcd file path
 - tf_XX: If the position or direction between GNSS and LiDAR is different, it must be entered in tf.
 
-**[points_map 저장법]**
+**[How to save points_map into pcd file]**
 
 ```
 rosparam set save_map $(voxel leaf size)
